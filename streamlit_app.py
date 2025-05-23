@@ -25,6 +25,7 @@ st.set_page_config(
 # Define country codes globally - THIS MUST BE AT TOP LEVEL
 COUNTRY_OPTIONS = {
     "Sierra Leone": "SLE",
+    "Gambia": "GMB",
     "Guinea": "GIN", 
     "Mali": "MLI",
     "Burkina Faso": "BFA",
