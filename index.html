@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHIRPS Rainfall Analysis Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            text-align: center;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.6s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        h1 {
+            font-size: 3.8rem;
+            margin-bottom: 35px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            background: linear-gradient(45deg, #ffffff, #f8f9fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 3.2rem;
+            margin-bottom: 30px;
+            color: #ffffff;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: 2.6rem;
+            margin-bottom: 25px;
+            color: #f8f9fa;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        p {
+            font-size: 1.5rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            max-width: 900px;
+            font-weight: 400;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            color: #e8eaf6;
+            font-weight: 300;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .problem-slide {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .solution-slide {
+            background: linear-gradient(135deg, #4ecdc4 0%, #00d2d3 100%);
+        }
+
+        .features-slide {
+            background: linear-gradient(135deg, #45b7d1 0%, #96c93d 100%);
+        }
+
+        .technical-slide {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+        }
+
+        .impact-slide {
+            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+        }
+
+        .demo-slide {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+        }
+
+        .future-slide {
+            background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);
+        }
+
+        .conclusion-slide {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+            max-width: 1000px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 35px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #f5f5f5;
+            font-weight: 400;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            max-width: 800px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: #c5cae9;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            z-index: 1000;
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #ffd700, #ffeb3b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            text-shadow: none;
+            filter: brightness(1.1) contrast(1.2);
+        }
+
+        .workflow-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            max-width: 1000px;
+        }
+
+        .workflow-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .workflow-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            line-height: 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .animated-icon {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .citation {
+            position: fixed;
+            bottom: 10px;
+            left: 30px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="slide-counter">
+            <span id="current-slide">1</span> / <span id="total-slides">9</span>
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="animated-icon" style="font-size: 5rem; margin-bottom: 30px;">🌧️</div>
+            <h1>CHIRPS Rainfall Analysis Tool</h1>
+            <p class="subtitle">Climate-Informed Malaria Intervention Planning for Africa</p>
+            <div style="margin-top: 40px;">
+                <p><strong>Mohamed Sillah Kanu</strong></p>
+                <p>Northwestern University Malaria Modeling Team</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: The Problem -->
+        <div class="slide problem-slide">
+            <h2>🚨 The Challenge</h2>
+            <h3>Malaria transmission is <span class="highlight">highly seasonal</span></h3>
+            <p>Rainfall patterns directly influence mosquito breeding and malaria transmission, yet public health teams often lack accessible tools to analyze climate data for intervention planning.</p>
+            
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-number">241M</div>
+                    <div class="stat-label">Malaria Cases (2020)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">627K</div>
+                    <div class="stat-label">Deaths Annually</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Cases in Africa</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Current Challenges -->
+        <div class="slide problem-slide">
+            <h2>🎯 Current Barriers</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💻</div>
+                    <h3>Technical Complexity</h3>
+                    <p>Climate data requires specialized GIS and programming skills</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Data Accessibility</h3>
+                    <p>Satellite data scattered across multiple platforms and formats</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3>Time Constraints</h3>
+                    <p>Public health teams need rapid analysis for intervention timing</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Analysis Burden</h3>
+                    <p>Complex processing pipelines limit operational use</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: The Solution -->
+        <div class="slide solution-slide">
+            <h2>💡 Our Solution</h2>
+            <h3>A <span class="highlight">web-based tool</span> that democratizes climate data</h3>
+            
+            <div class="workflow-steps">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <h4>Select</h4>
+                    <p>Choose country & timeframe</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <h4>Analyze</h4>
+                    <p>Automated CHIRPS processing</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <h4>Visualize</h4>
+                    <p>Interactive rainfall maps</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <h4>Export</h4>
+                    <p>Download analysis-ready data</p>
+                </div>
+            </div>
+
+            <p style="margin-top: 40px; font-size: 1.6rem;">
+                <span class="highlight">No coding required.</span> No GIS expertise needed. 
+                Just point, click, and analyze.
+            </p>
+        </div>
+
+        <!-- Slide 5: Key Features -->
+        <div class="slide features-slide">
+            <h2>🚀 Key Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🗺️</div>
+                    <h3>Comprehensive Coverage</h3>
+                    <p>All African countries • 5 administrative levels • Custom boundaries</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📡</div>
+                    <h3>CHIRPS Integration</h3>
+                    <p>40+ years of satellite rainfall data • 5km resolution • Monthly updates</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Smart Analytics</h3>
+                    <p>Automated processing • Statistical summaries • Multi-temporal analysis</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h3>Export Ready</h3>
+                    <p>CSV & Excel downloads • Analysis metadata • Publication-ready data</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Technical Innovation -->
+        <div class="slide technical-slide">
+            <h2>⚙️ Technical Architecture</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Streamlit Framework</h3>
+                    <p>Interactive web interface with real-time processing</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛰️</div>
+                    <h3>CHIRPS v2.0 API</h3>
+                    <p>Direct integration with UCSB Climate Hazards Group</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🗺️</div>
+                    <h3>GADM Database</h3>
+                    <p>Official administrative boundaries for 50+ African countries</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>GeoPandas Processing</h3>
+                    <p>Efficient spatial analysis and raster-vector operations</p>
+                </div>
+            </div>
+            
+            <p style="margin-top: 30px;">
+                <span class="highlight">Cloud-ready architecture</span> enables scalable deployment for regional health organizations
+            </p>
+        </div>
+
+        <!-- Slide 7: Impact & Applications -->
+        <div class="slide impact-slide">
+            <h2>🎯 Real-World Impact</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💊</div>
+                    <h3>SMC Planning</h3>
+                    <p>Seasonal Malaria Chemoprevention timing optimization</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Intervention Targeting</h3>
+                    <p>Identify high-risk areas during peak transmission</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3>Resource Allocation</h3>
+                    <p>Data-driven distribution of bed nets and treatments</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Research Support</h3>
+                    <p>Climate-malaria modeling and epidemiological studies</p>
+                </div>
+            </div>
+
+            <div class="stats-container" style="margin-top: 40px;">
+                <div class="stat-item">
+                    <div class="stat-number">1981</div>
+                    <div class="stat-label">Starting Year</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">5km</div>
+                    <div class="stat-label">Resolution</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Demo Workflow -->
+        <div class="slide demo-slide">
+            <h2>🖥️ User Experience</h2>
+            <h3>Discovering <span class="highlight">Peak Rainfall Seasons</span> Visually</h3>
+            
+            <div style="text-align: left; max-width: 800px; margin-top: 40px;">
+                <p style="margin-bottom: 30px; font-size: 1.4rem;">
+                    <strong>🎯 Real Scenario:</strong><br>
+                    "When does peak rainfall occur in different regions? Which months drive highest malaria transmission risk?"
+                </p>
+                
+                <div class="workflow-steps" style="margin: 40px 0;">
+                    <div class="workflow-step">
+                        <div class="step-number">1</div>
+                        <h4>Select Region</h4>
+                        <p>Pick any African country</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">2</div>
+                        <h4>Compare Months</h4>
+                        <p>Analyze Jan-Dec patterns</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">3</div>
+                        <h4>Visual Discovery</h4>
+                        <p>Maps reveal peak seasons</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">4</div>
+                        <h4>Smart Planning</h4>
+                        <p>Time interventions perfectly</p>
+                    </div>
+                </div>
+                
+                <p style="font-size: 1.4rem; color: #fff; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                    <strong>🔍 Key Insight:</strong> Interactive maps instantly show rainfall intensity patterns - bright blues indicate heavy rainfall months, helping teams identify optimal intervention windows without complex data analysis.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Future Directions -->
+        <div class="slide future-slide">
+            <h2>🔮 Future Enhancements</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🌡️</div>
+                    <h3>Multi-Climate Variables</h3>
+                    <p>Temperature, humidity, vegetation indices</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Real-time Forecasts</h3>
+                    <p>Seasonal precipitation predictions</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>ML Integration</h3>
+                    <p>Predictive models for transmission risk</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Deployment</h3>
+                    <p>Field-ready app for health workers</p>
+                </div>
+            </div>
+            
+            <p style="margin-top: 40px; font-size: 1.5rem;">
+                <span class="highlight">Vision:</span> A comprehensive climate-health intelligence platform for Africa
+            </p>
+        </div>
+
+        <!-- Slide 10: Conclusion -->
+        <div class="slide conclusion-slide">
+            <div class="animated-icon" style="font-size: 4rem; margin-bottom: 30px;">🌍</div>
+            <h2>Empowering Evidence-Based Malaria Control</h2>
+            <p style="font-size: 1.8rem; margin-bottom: 40px;">
+                Making satellite climate data <span class="highlight">accessible</span> to save lives
+            </p>
+            
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; margin-bottom: 40px;">
+                <p style="font-size: 1.4rem; font-style: italic;">
+                    "By bridging the gap between climate science and public health practice, 
+                    we enable data-driven decisions that optimize malaria interventions 
+                    across Africa's diverse landscapes."
+                </p>
+            </div>
+            
+            <div>
+                <p style="font-size: 1.2rem; margin-bottom: 10px;"><strong>Contact:</strong></p>
+                <p>Mohamed Sillah Kanu</p>
+                <p>Northwestern University Malaria Modeling Team</p>
+                <p style="margin-top: 20px; font-size: 1.1rem; color: #c5cae9;">Thank you for your attention! 🙏</p>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prev-btn">← Previous</button>
+            <button class="nav-btn" id="next-btn">Next →</button>
+        </div>
+
+        <div class="citation">
+            CHIRPS Rainfall Analysis Tool | Northwestern University
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            slides[currentSlide].classList.add('prev');
+            
+            currentSlide = (n + totalSlides) % totalSlides;
+            
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                }
+            });
+            
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        document.getElementById('next-btn').addEventListener('click', nextSlide);
+        document.getElementById('prev-btn').addEventListener('click', prevSlide);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Auto-advance (optional - uncomment to enable)
+        // setInterval(nextSlide, 10000); // 10 seconds per slide
+    </script>
+</body>
+</html>
