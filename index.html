@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
             color: white;
             overflow: hidden;
         }
@@ -94,35 +94,35 @@
         }
 
         .problem-slide {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
         }
 
         .solution-slide {
-            background: linear-gradient(135deg, #4ecdc4 0%, #00d2d3 100%);
+            background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
         }
 
         .features-slide {
-            background: linear-gradient(135deg, #45b7d1 0%, #96c93d 100%);
+            background: linear-gradient(135deg, #64b5f6 0%, #1e88e5 100%);
         }
 
         .technical-slide {
-            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
         }
 
         .impact-slide {
-            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
         }
 
         .demo-slide {
-            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
         }
 
         .future-slide {
-            background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);
+            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
         }
 
         .conclusion-slide {
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+            background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
         }
 
         .feature-grid {
@@ -186,7 +186,7 @@
 
         .stat-label {
             font-size: 1.2rem;
-            color: #c5cae9;
+            color: #bbdefb;
         }
 
         .navigation {
@@ -228,13 +228,13 @@
         }
 
         .highlight {
-            background: linear-gradient(45deg, #ffd700, #ffeb3b);
+            background: linear-gradient(45deg, #ffffff, #e3f2fd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             font-weight: 700;
             text-shadow: none;
-            filter: brightness(1.1) contrast(1.2);
+            filter: brightness(1.2) contrast(1.3);
         }
 
         .workflow-steps {
@@ -265,11 +265,12 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.3);
             line-height: 50px;
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
         }
 
         .animated-icon {
@@ -287,7 +288,7 @@
             bottom: 10px;
             left: 30px;
             font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.8);
             z-index: 1000;
         }
     </style>
@@ -300,10 +301,9 @@
 
         <!-- Slide 1: Title -->
         <div class="slide active">
-            <div class="animated-icon" style="font-size: 5rem; margin-bottom: 30px;">🌧️</div>
-            <h1>CHIRPS Rainfall Analysis Tool</h1>
+            <h1 style="color: #000000 !important; font-weight: 900 !important; text-shadow: none !important; background: none !important; -webkit-text-fill-color: #000000 !important;">CHIRPS Rainfall Analysis Tool</h1>
             <p class="subtitle">Climate-Informed Malaria Intervention Planning for Africa</p>
-            <div style="margin-top: 40px;">
+            <div style="margin-top: 60px;">
                 <p><strong>Mohamed Sillah Kanu</strong></p>
                 <p>Northwestern University Malaria Modeling Team</p>
             </div>
@@ -311,7 +311,7 @@
 
         <!-- Slide 2: The Problem -->
         <div class="slide problem-slide">
-            <h2>🚨 The Challenge</h2>
+            <h2>The Challenge</h2>
             <h3>Malaria transmission is <span class="highlight">highly seasonal</span></h3>
             <p>Rainfall patterns directly influence mosquito breeding and malaria transmission, yet public health teams often lack accessible tools to analyze climate data for intervention planning.</p>
             
@@ -333,25 +333,21 @@
 
         <!-- Slide 3: Current Challenges -->
         <div class="slide problem-slide">
-            <h2>🎯 Current Barriers</h2>
+            <h2>Current Barriers</h2>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">💻</div>
                     <h3>Technical Complexity</h3>
                     <p>Climate data requires specialized GIS and programming skills</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🌍</div>
                     <h3>Data Accessibility</h3>
                     <p>Satellite data scattered across multiple platforms and formats</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">⏰</div>
                     <h3>Time Constraints</h3>
                     <p>Public health teams need rapid analysis for intervention timing</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📊</div>
                     <h3>Analysis Burden</h3>
                     <p>Complex processing pipelines limit operational use</p>
                 </div>
@@ -360,7 +356,7 @@
 
         <!-- Slide 4: The Solution -->
         <div class="slide solution-slide">
-            <h2>💡 Our Solution</h2>
+            <h2>Our Solution</h2>
             <h3>A <span class="highlight">web-based tool</span> that democratizes climate data</h3>
             
             <div class="workflow-steps">
@@ -394,25 +390,21 @@
 
         <!-- Slide 5: Key Features -->
         <div class="slide features-slide">
-            <h2>🚀 Key Features</h2>
+            <h2>Key Features</h2>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🗺️</div>
                     <h3>Comprehensive Coverage</h3>
                     <p>All African countries • 5 administrative levels • Custom boundaries</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📡</div>
                     <h3>CHIRPS Integration</h3>
                     <p>40+ years of satellite rainfall data • 5km resolution • Monthly updates</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📊</div>
                     <h3>Smart Analytics</h3>
                     <p>Automated processing • Statistical summaries • Multi-temporal analysis</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">💾</div>
                     <h3>Export Ready</h3>
                     <p>CSV & Excel downloads • Analysis metadata • Publication-ready data</p>
                 </div>
@@ -421,25 +413,21 @@
 
         <!-- Slide 6: Technical Innovation -->
         <div class="slide technical-slide">
-            <h2>⚙️ Technical Architecture</h2>
+            <h2>Technical Architecture</h2>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🌐</div>
                     <h3>Streamlit Framework</h3>
                     <p>Interactive web interface with real-time processing</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🛰️</div>
                     <h3>CHIRPS v2.0 API</h3>
                     <p>Direct integration with UCSB Climate Hazards Group</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🗺️</div>
                     <h3>GADM Database</h3>
                     <p>Official administrative boundaries for 50+ African countries</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📈</div>
                     <h3>GeoPandas Processing</h3>
                     <p>Efficient spatial analysis and raster-vector operations</p>
                 </div>
@@ -452,25 +440,21 @@
 
         <!-- Slide 7: Impact & Applications -->
         <div class="slide impact-slide">
-            <h2>🎯 Real-World Impact</h2>
+            <h2>Real-World Impact</h2>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">💊</div>
                     <h3>SMC Planning</h3>
                     <p>Seasonal Malaria Chemoprevention timing optimization</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
                     <h3>Intervention Targeting</h3>
                     <p>Identify high-risk areas during peak transmission</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📋</div>
                     <h3>Resource Allocation</h3>
                     <p>Data-driven distribution of bed nets and treatments</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📈</div>
                     <h3>Research Support</h3>
                     <p>Climate-malaria modeling and epidemiological studies</p>
                 </div>
@@ -494,12 +478,12 @@
 
         <!-- Slide 8: Demo Workflow -->
         <div class="slide demo-slide">
-            <h2>🖥️ User Experience</h2>
+            <h2>User Experience</h2>
             <h3>Discovering <span class="highlight">Peak Rainfall Seasons</span> Visually</h3>
             
             <div style="text-align: left; max-width: 800px; margin-top: 40px;">
                 <p style="margin-bottom: 30px; font-size: 1.4rem;">
-                    <strong>🎯 Real Scenario:</strong><br>
+                    <strong>Real Scenario:</strong><br>
                     "When does peak rainfall occur in different regions? Which months drive highest malaria transmission risk?"
                 </p>
                 
@@ -527,32 +511,28 @@
                 </div>
                 
                 <p style="font-size: 1.4rem; color: #fff; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
-                    <strong>🔍 Key Insight:</strong> Interactive maps instantly show rainfall intensity patterns - bright blues indicate heavy rainfall months, helping teams identify optimal intervention windows without complex data analysis.
+                    <strong>Key Insight:</strong> Interactive maps instantly show rainfall intensity patterns - bright blues indicate heavy rainfall months, helping teams identify optimal intervention windows without complex data analysis.
                 </p>
             </div>
         </div>
 
         <!-- Slide 9: Future Directions -->
         <div class="slide future-slide">
-            <h2>🔮 Future Enhancements</h2>
+            <h2>Future Enhancements</h2>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🌡️</div>
                     <h3>Multi-Climate Variables</h3>
                     <p>Temperature, humidity, vegetation indices</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🔄</div>
                     <h3>Real-time Forecasts</h3>
                     <p>Seasonal precipitation predictions</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
                     <h3>ML Integration</h3>
                     <p>Predictive models for transmission risk</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📱</div>
                     <h3>Mobile Deployment</h3>
                     <p>Field-ready app for health workers</p>
                 </div>
@@ -565,7 +545,6 @@
 
         <!-- Slide 10: Conclusion -->
         <div class="slide conclusion-slide">
-            <div class="animated-icon" style="font-size: 4rem; margin-bottom: 30px;">🌍</div>
             <h2>Empowering Evidence-Based Malaria Control</h2>
             <p style="font-size: 1.8rem; margin-bottom: 40px;">
                 Making satellite climate data <span class="highlight">accessible</span> to save lives
@@ -583,7 +562,7 @@
                 <p style="font-size: 1.2rem; margin-bottom: 10px;"><strong>Contact:</strong></p>
                 <p>Mohamed Sillah Kanu</p>
                 <p>Northwestern University Malaria Modeling Team</p>
-                <p style="margin-top: 20px; font-size: 1.1rem; color: #c5cae9;">Thank you for your attention! 🙏</p>
+                <p style="margin-top: 20px; font-size: 1.1rem; color: #bbdefb;">Thank you for your attention!</p>
             </div>
         </div>
 
