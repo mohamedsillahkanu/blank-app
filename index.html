@@ -27,18 +27,19 @@
         .slide {
             position: absolute;
             width: 100%;
-            height: 100%;
+            height: calc(100vh - 80px);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 60px;
-            padding-bottom: 120px;
+            padding: 30px 100px 20px 100px;
             text-align: center;
             opacity: 0;
             transform: translateX(100%);
             transition: all 0.6s ease-in-out;
             background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%) !important;
+            overflow-y: auto;
+            box-sizing: border-box;
         }
 
         .slide.active {
@@ -130,14 +131,14 @@
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
+            gap: 25px;
+            margin-top: 30px;
             max-width: 1000px;
         }
 
         .feature-card {
             background: rgba(255, 255, 255, 0.15);
-            padding: 35px;
+            padding: 25px;
             border-radius: 20px;
             backdrop-filter: blur(15px);
             border: 2px solid rgba(255, 255, 255, 0.25);
@@ -146,22 +147,23 @@
         }
 
         .feature-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
 
         .feature-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
+            font-size: 1.6rem;
+            margin-bottom: 12px;
             color: #ffffff;
             font-weight: 600;
         }
 
         .feature-card p {
-            font-size: 1.2rem;
-            line-height: 1.6;
+            font-size: 1.1rem;
+            line-height: 1.5;
             color: #f5f5f5;
             font-weight: 400;
+            margin-bottom: 0;
         }
 
         .feature-icon {
@@ -172,7 +174,7 @@
         .stats-container {
             display: flex;
             justify-content: space-around;
-            margin-top: 40px;
+            margin-top: 30px;
             max-width: 800px;
         }
 
@@ -181,52 +183,77 @@
         }
 
         .stat-number {
-            font-size: 3rem;
+            font-size: 2.4rem;
             font-weight: bold;
             color: #fff;
         }
 
         .stat-label {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #bbdefb;
         }
 
         .navigation {
             position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
             display: flex;
-            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
             z-index: 1000;
+            background: rgba(13, 71, 161, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .nav-btn {
-            padding: 12px 24px;
+        .nav-arrow {
+            width: 60px;
+            height: 60px;
             background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
             color: white;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 24px;
+            font-weight: bold;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
         }
 
-        .nav-btn:hover {
+        .nav-arrow:hover {
             background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .nav-arrow:active {
+            transform: scale(0.95);
+        }
+
+        .nav-arrow.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         .slide-counter {
             position: fixed;
             top: 30px;
             right: 30px;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.2);
             padding: 10px 20px;
             border-radius: 20px;
             font-size: 1rem;
             z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
         }
 
         .highlight {
@@ -588,8 +615,8 @@
         </div>
 
         <div class="navigation">
-            <button class="nav-btn" id="prev-btn">← Previous</button>
-            <button class="nav-btn" id="next-btn">Next →</button>
+            <div class="nav-arrow" id="prev-btn">‹</div>
+            <div class="nav-arrow" id="next-btn">›</div>
         </div>
 
         <div class="citation">
@@ -620,14 +647,36 @@
             });
             
             document.getElementById('current-slide').textContent = currentSlide + 1;
+            
+            // Update arrow states
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            // Remove disabled class from both arrows
+            prevBtn.classList.remove('disabled');
+            nextBtn.classList.remove('disabled');
+            
+            // Disable previous arrow on first slide
+            if (currentSlide === 0) {
+                prevBtn.classList.add('disabled');
+            }
+            
+            // Disable next arrow on last slide
+            if (currentSlide === totalSlides - 1) {
+                nextBtn.classList.add('disabled');
+            }
         }
 
         function nextSlide() {
-            showSlide(currentSlide + 1);
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
         }
 
         function prevSlide() {
-            showSlide(currentSlide - 1);
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
         }
 
         document.getElementById('next-btn').addEventListener('click', nextSlide);
@@ -642,8 +691,10 @@
             }
         });
 
-        // Auto-advance (optional - uncomment to enable)
-        // setInterval(nextSlide, 10000); // 10 seconds per slide
+        // Initialize arrow states
+        document.addEventListener('DOMContentLoaded', function() {
+            showSlide(0); // This will set the initial arrow states
+        });
     </script>
 </body>
 </html>
