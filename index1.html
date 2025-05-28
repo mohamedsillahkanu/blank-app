@@ -1,0 +1,814 @@
+<!-- Slide 10: Conclusion -->
+        <div class="slide conclusion-slide">
+            <h2>Democratizing Climate Data for Global Health</h2>
+            <p style="font-size: 1.7rem; margin-bottom: 30px;">
+                From <span class="highlight">expert-exclusive</span> to <span class="highlight">universally accessible</span>
+            </p>
+            
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; margin-bottom: 30px;">
+                <p style="font-size: 1.4rem; font-style: italic;">
+                    "Transforming satellite rainfall analysis from a complex, expert-only process 
+                    requiring advanced programming skills into a simple, accessible tool that anyone 
+                    can use on any device, anywhere in the world."
+                </p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; max-width: 800px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #ffffff;">BEFORE</div>
+                    <div style="color: #bbdefb;">Days of coding</div>
+                    <div style="color: #bbdefb;">Expert programmers only</div>
+                    <div style="color: #bbdefb;">Expensive software</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #ffffff;">NOW</div>
+                    <div style="color: #bbdefb;">Minutes of clicking</div>
+                    <div style="color: #bbdefb;">Anyone, anywhere</div>
+                    <div style="color: #bbdefb;">Free and accessible</div>
+                </div>
+            </div>
+            
+            <div>
+                <p style="font-size: 1.2rem; margin-bottom: 10px;"><strong>Contact:</strong></p>
+                <p>Mohamed Sillah Kanu</p>
+                <p>Northwestern University Malaria Modeling Team</p>
+                <p style="margin-top: 20px; font-size: 1.1rem; color: #<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHIRPS Rainfall Analysis Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 120px 20px 120px;
+            text-align: center;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%) !important;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        h1 {
+            font-size: 3.8rem;
+            margin-bottom: 35px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            background: linear-gradient(45deg, #ffffff, #f8f9fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 3.2rem;
+            margin-bottom: 30px;
+            color: #ffffff;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: 2.6rem;
+            margin-bottom: 25px;
+            color: #f8f9fa;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        p {
+            font-size: 1.5rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            max-width: 900px;
+            font-weight: 400;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            color: #e8eaf6;
+            font-weight: 300;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .problem-slide {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+        }
+
+        .solution-slide {
+            background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
+        }
+
+        .features-slide {
+            background: linear-gradient(135deg, #64b5f6 0%, #1e88e5 100%);
+        }
+
+        .technical-slide {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+        }
+
+        .impact-slide {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        }
+
+        .demo-slide {
+            background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+        }
+
+        .future-slide {
+            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+        }
+
+        .conclusion-slide {
+            background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 35px;
+            max-width: 1100px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 30px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .feature-card h3 {
+            font-size: 1.7rem;
+            margin-bottom: 15px;
+            color: #ffffff;
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .feature-card p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #f0f4ff;
+            font-weight: 400;
+            margin-bottom: 0;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            max-width: 800px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.4rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #bbdefb;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 1000;
+            background: rgba(13, 71, 161, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-arrow {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.25);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            font-size: 28px;
+            font-weight: bold;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.15);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-arrow:active {
+            transform: scale(1.05);
+        }
+
+        .nav-arrow.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #ffffff, #e8f4fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            text-shadow: none;
+            filter: brightness(1.3) contrast(1.4);
+            position: relative;
+        }
+
+        .highlight::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(45deg, #ffffff, #e8f4fd);
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+
+        .workflow-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            max-width: 1000px;
+            gap: 20px;
+        }
+
+        .workflow-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            padding: 0 15px;
+        }
+
+        .workflow-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 30px;
+            transform: translateY(-50%);
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            line-height: 60px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .step-number:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .animated-icon {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .citation {
+            position: fixed;
+            bottom: 10px;
+            left: 30px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="slide-counter">
+            <span id="current-slide">1</span> / <span id="total-slides">9</span>
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div style="margin-bottom: 45px;">
+                <div style="width: 160px; height: 160px; margin: 0 auto 25px auto; background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.4); border-radius: 25px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <p style="font-size: 1.3rem; color: #bbdefb; text-align: center; margin: 0; font-weight: 600;">LOGO<br>PLACEHOLDER</p>
+                </div>
+            </div>
+            <h1 style="color: #000000 !important; font-weight: 900 !important; text-shadow: none !important; background: none !important; -webkit-text-fill-color: #000000 !important;">CHIRPS Rainfall Analysis Tool</h1>
+            <p class="subtitle">Climate-Informed Malaria Intervention Planning for Africa</p>
+            <div style="margin-top: 60px; padding: 25px; background: rgba(255,255,255,0.1); border-radius: 20px; backdrop-filter: blur(10px);">
+                <p style="font-size: 1.4rem; margin-bottom: 10px;"><strong>Mohamed Sillah Kanu</strong></p>
+                <p style="font-size: 1.2rem; color: #bbdefb;">Northwestern University Malaria Modeling Team</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: The Problem -->
+        <div class="slide problem-slide">
+            <h2>The Traditional Challenge</h2>
+            <h3>Rainfall data analysis was <span class="highlight">exclusive to experts</span></h3>
+            <p>Working with .tif rainfall datasets required advanced programming skills in R, Python, and specialized GIS software. The process was complex, time-consuming, and accessible only to technical specialists.</p>
+            
+            <div style="margin-top: 40px;">
+                <table style="margin: 0 auto; background: rgba(255,255,255,0.15); border-radius: 15px; padding: 30px; backdrop-filter: blur(15px); border: 2px solid rgba(255,255,255,0.25);">
+                    <thead>
+                        <tr style="border-bottom: 3px solid rgba(255,255,255,0.4);">
+                            <th style="padding: 20px 40px; font-size: 1.8rem; font-weight: 600; color: #ffffff; text-align: center;">Global Malaria Burden</th>
+                            <th style="padding: 20px 40px; font-size: 1.8rem; font-weight: 600; color: #ffffff; text-align: center;">2022 Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 15px 40px; font-size: 1.4rem; color: #e3f2fd; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">Total Cases</td>
+                            <td style="padding: 15px 40px; font-size: 2.2rem; font-weight: 700; color: #ffffff; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">249 Million</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 15px 40px; font-size: 1.4rem; color: #e3f2fd; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">Deaths</td>
+                            <td style="padding: 15px 40px; font-size: 2.2rem; font-weight: 700; color: #ffffff; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">608,000</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 15px 40px; font-size: 1.4rem; color: #e3f2fd; text-align: center;">Cases in Africa</td>
+                            <td style="padding: 15px 40px; font-size: 2.2rem; font-weight: 700; color: #ffffff; text-align: center;">94%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <p style="margin-top: 25px; font-size: 1.1rem; color: #bbdefb; font-style: italic; text-align: center;">
+                    Source: WHO World Malaria Report 2023
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Current Challenges -->
+        <div class="slide problem-slide">
+            <h2>Technical Barriers to Rainfall Analysis</h2>
+            <h3>The <span class="highlight">expert-only</span> traditional workflow</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Advanced Programming</h3>
+                    <p>Required expertise in R, Python, GDAL, and complex geospatial libraries</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Software Installation</h3>
+                    <p>Multiple software packages, dependencies, and environment setup</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Time-Intensive Process</h3>
+                    <p>Hours to download, process .tif files, and link to shapefiles</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Computer Requirements</h3>
+                    <p>High-performance workstations with specialized GIS software</p>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; margin-top: 30px; max-width: 800px;">
+                <p style="font-size: 1.4rem; font-style: italic; color: #ffffff; margin-bottom: 0;">
+                    <strong>Result:</strong> Rainfall data analysis remained locked behind technical barriers, 
+                    limiting access for public health professionals who needed it most.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 4: The Solution -->
+        <div class="slide solution-slide">
+            <h2>Revolutionary Accessibility</h2>
+            <h3><span class="highlight">No coding. No installation. No barriers.</span></h3>
+            
+            <div style="background: rgba(255,255,255,0.15); padding: 30px; border-radius: 20px; margin-bottom: 30px; max-width: 850px;">
+                <p style="font-size: 1.6rem; font-weight: 500; margin-bottom: 0; color: #ffffff;">
+                    From complex .tif processing to <strong>point-and-click simplicity</strong> - 
+                    making satellite rainfall data accessible to everyone, anywhere, on any device.
+                </p>
+            </div>
+            
+            <div class="workflow-steps">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <h4>Open Browser</h4>
+                    <p>No software to install</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <h4>Select Area</h4>
+                    <p>Choose any region</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <h4>Get Results</h4>
+                    <p>Instant processing</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <h4>Download Data</h4>
+                    <p>CSV/Excel ready</p>
+                </div>
+            </div>
+
+            <p style="margin-top: 30px; font-size: 1.5rem; color: #ffffff;">
+                <span class="highlight">Works on phones, tablets, laptops</span> - 
+                bringing satellite data to the field
+            </p>
+        </div>
+
+        <!-- Slide 5: Key Features -->
+        <div class="slide features-slide">
+            <h2>From Expert-Only to Everyone</h2>
+            <h3>Transforming <span class="highlight">complex workflows</span> into simple clicks</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Zero Installation</h3>
+                    <p>Web-based platform accessible from any device • No software downloads or setup required</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Mobile-Friendly</h3>
+                    <p>Works on smartphones and tablets • Field teams can access data anywhere</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Instant Processing</h3>
+                    <p>What took hours now takes minutes • Automated .tif extraction and shapefile linking</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Ready-to-Use Exports</h3>
+                    <p>Download in CSV or Excel format • No technical post-processing needed</p>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; margin-top: 30px; max-width: 800px;">
+                <p style="font-size: 1.4rem; font-weight: 500; color: #ffffff; margin-bottom: 0;">
+                    <span class="highlight">Revolutionary Impact:</span> Democratizing satellite rainfall data analysis 
+                    from PhD-level programming to elementary school simplicity
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Technical Innovation -->
+        <div class="slide technical-slide">
+            <h2>The Power of Rainfall Data</h2>
+            <h3>Critical insights for <span class="highlight">multiple sectors</span></h3>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Public Health</h3>
+                    <p>Malaria intervention timing • Disease outbreak prediction • Health resource planning</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Agriculture</h3>
+                    <p>Crop planning • Irrigation scheduling • Drought monitoring • Yield forecasting</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Disaster Management</h3>
+                    <p>Flood early warning • Emergency preparedness • Climate risk assessment</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Research & Development</h3>
+                    <p>Climate studies • Policy making • Environmental monitoring • Academic research</p>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; margin-top: 30px; max-width: 800px;">
+                <p style="font-size: 1.4rem; color: #ffffff; margin-bottom: 0;">
+                    <strong>Previously:</strong> Only data scientists with R/Python expertise could unlock these insights.<br>
+                    <strong><span class="highlight">Now:</span></strong> Anyone with internet access can harness satellite rainfall data for decision-making.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Impact & Applications -->
+        <div class="slide impact-slide">
+            <h2>Breaking Down the Expert Barrier</h2>
+            <h3>From <span class="highlight">days of coding</span> to minutes of clicking</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; max-width: 1000px;">
+                <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px;">
+                    <h4 style="color: #ffcdd2; font-size: 1.8rem; margin-bottom: 20px; font-weight: 600;">BEFORE: Expert-Only Process</h4>
+                    <ul style="text-align: left; font-size: 1.2rem; line-height: 1.8; color: #e3f2fd;">
+                        <li>Install R/Python + packages</li>
+                        <li>Download .tif files manually</li>
+                        <li>Write complex scripts</li>
+                        <li>Process shapefiles</li>
+                        <li>Extract & merge data</li>
+                        <li>Debug errors for hours</li>
+                        <li>Format output manually</li>
+                    </ul>
+                    <p style="color: #ffcdd2; font-weight: bold; margin-top: 15px; font-size: 1.3rem;">Time: 1-3 days | Skill: Expert level</p>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.15); padding: 25px; border-radius: 15px;">
+                    <h4 style="color: #c8e6c9; font-size: 1.8rem; margin-bottom: 20px; font-weight: 600;">NOW: Anyone Can Do It</h4>
+                    <ul style="text-align: left; font-size: 1.2rem; line-height: 1.8; color: #e3f2fd;">
+                        <li>Open web browser</li>
+                        <li>Select your region</li>
+                        <li>Choose time period</li>
+                        <li>Click "Generate Analysis"</li>
+                        <li>Download ready data</li>
+                        <li>Use on any device</li>
+                        <li>Share instantly</li>
+                    </ul>
+                    <p style="color: #c8e6c9; font-weight: bold; margin-top: 15px; font-size: 1.3rem;">Time: 2-5 minutes | Skill: None required</p>
+                </div>
+            </div>
+            
+            <p style="margin-top: 30px; font-size: 1.5rem; color: #ffffff; font-weight: 500;">
+                <span class="highlight">Game-changing innovation:</span> Making satellite climate data as easy to use as checking the weather
+            </p>
+        </div>
+
+        <!-- Slide 8: Demo Workflow -->
+        <div class="slide demo-slide">
+            <h2>Democratizing Satellite Data</h2>
+            <h3>Real scenario: <span class="highlight">Field worker without coding skills</span></h3>
+            
+            <div style="text-align: left; max-width: 900px; margin-top: 30px;">
+                <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; margin-bottom: 25px;">
+                    <p style="font-size: 1.4rem; margin-bottom: 0;">
+                        <strong>Scenario:</strong> A health worker in rural Ghana needs rainfall data to plan malaria interventions. 
+                        Previously impossible without technical expertise.
+                    </p>
+                </div>
+                
+                <div class="workflow-steps" style="margin: 30px 0;">
+                    <div class="workflow-step">
+                        <div class="step-number">1</div>
+                        <h4>Mobile Access</h4>
+                        <p>Open tool on smartphone</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">2</div>
+                        <h4>Simple Selection</h4>
+                        <p>Choose Ghana districts</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">3</div>
+                        <h4>Instant Results</h4>
+                        <p>View rainfall patterns</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">4</div>
+                        <h4>Share Data</h4>
+                        <p>Download & send to team</p>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                    <p style="font-size: 1.3rem; color: #ffffff; margin-bottom: 0;">
+                        <strong>Innovation Impact:</strong> Satellite rainfall analysis that previously required 
+                        <span class="highlight">PhD-level programming skills</span> now accessible to anyone with a smartphone and internet connection.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Future Directions -->
+        <div class="slide future-slide">
+            <h2>Future Enhancements</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Multi-Climate Variables</h3>
+                    <p>Temperature, humidity, vegetation indices</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Real-time Forecasts</h3>
+                    <p>Seasonal precipitation predictions</p>
+                </div>
+                <div class="feature-card">
+                    <h3>ML Integration</h3>
+                    <p>Predictive models for transmission risk</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Mobile Deployment</h3>
+                    <p>Field-ready app for health workers</p>
+                </div>
+            </div>
+            
+            <p style="margin-top: 40px; font-size: 1.5rem;">
+                <span class="highlight">Vision:</span> A comprehensive climate-health intelligence platform for Africa
+            </p>
+        </div>
+
+        <!-- Slide 10: Conclusion -->
+        <div class="slide conclusion-slide">
+            <h2>Democratizing Climate Data for Global Health</h2>
+            <p style="font-size: 1.7rem; margin-bottom: 30px;">
+                From <span class="highlight">expert-exclusive</span> to <span class="highlight">universally accessible</span>
+            </p>
+            
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; margin-bottom: 30px;">
+                <p style="font-size: 1.4rem; font-style: italic;">
+                    "Transforming satellite rainfall analysis from a complex, expert-only process 
+                    requiring advanced programming skills into a simple, accessible tool that anyone 
+                    can use on any device, anywhere in the world."
+                </p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; max-width: 800px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #ffffff;">BEFORE</div>
+                    <div style="color: #bbdefb;">Days of coding</div>
+                    <div style="color: #bbdefb;">Expert programmers only</div>
+                    <div style="color: #bbdefb;">Expensive software</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #ffffff;">NOW</div>
+                    <div style="color: #bbdefb;">Minutes of clicking</div>
+                    <div style="color: #bbdefb;">Anyone, anywhere</div>
+                    <div style="color: #bbdefb;">Free and accessible</div>
+                </div>
+            </div>
+            
+            <div>
+                <p style="font-size: 1.2rem; margin-bottom: 10px;"><strong>Contact:</strong></p>
+                <p>Mohamed Sillah Kanu</p>
+                <p>Northwestern University Malaria Modeling Team</p>
+                <p style="margin-top: 20px; font-size: 1.1rem; color: #bbdefb;">Empowering global health through accessible climate data</p>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <div class="nav-arrow" id="prev-btn">‹</div>
+            <div class="nav-arrow" id="next-btn">›</div>
+        </div>
+
+        <div class="citation">
+            CHIRPS Rainfall Analysis Tool | Northwestern University
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            slides[currentSlide].classList.add('prev');
+            
+            currentSlide = (n + totalSlides) % totalSlides;
+            
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                }
+            });
+            
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            
+            // Update arrow states
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            // Remove disabled class from both arrows
+            prevBtn.classList.remove('disabled');
+            nextBtn.classList.remove('disabled');
+            
+            // Disable previous arrow on first slide
+            if (currentSlide === 0) {
+                prevBtn.classList.add('disabled');
+            }
+            
+            // Disable next arrow on last slide
+            if (currentSlide === totalSlides - 1) {
+                nextBtn.classList.add('disabled');
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        document.getElementById('next-btn').addEventListener('click', nextSlide);
+        document.getElementById('prev-btn').addEventListener('click', prevSlide);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Initialize arrow states
+        document.addEventListener('DOMContentLoaded', function() {
+            showSlide(0); // This will set the initial arrow states
+        });
+    </script>
+</body>
+</html>
