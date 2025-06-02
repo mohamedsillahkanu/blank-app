@@ -363,7 +363,7 @@ with st.sidebar:
         "📊 Select Months", 
         options=list(month_names.keys()),
         format_func=lambda x: month_names[x],
-        default=[6, 7, 8, 9],  # Peak malaria season
+        default=[1, 2, 3],  # default months
         help="Select months for analysis (typically Jun-Sep for West Africa)"
     )
 
