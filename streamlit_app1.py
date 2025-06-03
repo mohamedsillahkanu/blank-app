@@ -894,5 +894,5 @@ with col2:
 # Footer
 st.markdown("---")
 st.markdown("*Built for malaria researchers and public health professionals*")
-st.markdown("**Contact**: Mohamed Sillah Kanu | Northwestern University Malaria Modeling Team")
-st.markdown("*v2.1 - Enhanced with projection file (.prj) support for better coordinate system handling*")
+st.markdown("**Contact**: Mohamed Sillah Kanu | Informarics Consultancy Firm- Sierra Leone (ICF-SL)")
+s
