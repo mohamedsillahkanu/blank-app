@@ -895,4 +895,3 @@ with col2:
 st.markdown("---")
 st.markdown("*Built for malaria researchers and public health professionals*")
 st.markdown("**Contact**: Mohamed Sillah Kanu | Informarics Consultancy Firm- Sierra Leone (ICF-SL)")
-s
