@@ -391,75 +391,112 @@ def create_monthly_comparison_plot(data_dict, selected_years=None):
 st.title("🌧️ Enhanced CHIRPS Rainfall Data Analysis")
 st.markdown("*Advanced rainfall analysis with interactive visualizations and time series analysis*")
 
+# Sidebar for controls (shared across all tabs)
+with st.sidebar:
+    st.header("Analysis Parameters")
+    
+    # Data source selection
+    data_source = st.radio(
+        "📂 Select Data Source", 
+        ["GADM Database", "Upload Custom Shapefile"],
+        help="Choose between official GADM boundaries or upload your own shapefile"
+    )
+    st.session_state.data_source = data_source
+    
+    if data_source == "GADM Database":
+        country = st.selectbox("🌍 Select Country", list(COUNTRY_OPTIONS.keys()), 
+                              help="Select any African country")
+        admin_level = st.selectbox("🏛️ Administrative Level", [0, 1, 2, 3, 4], 
+                                  help="0=Country, 1=Regions, 2=Districts, 3=Communes, 4=Localities")
+        
+        country_code = COUNTRY_OPTIONS[country]
+        use_custom_shapefile = False
+        
+        st.session_state.country = country
+        st.session_state.country_code = country_code
+        st.session_state.admin_level = admin_level
+        st.session_state.use_custom_shapefile = False
+        
+    else:
+        st.markdown("**📁 Upload Shapefile Components**")
+        
+        shp_file = st.file_uploader("🗺️ Shapefile (.shp)", type=['shp'])
+        shx_file = st.file_uploader("🔍 Shape Index (.shx)", type=['shx'])
+        dbf_file = st.file_uploader("📊 Attribute Table (.dbf)", type=['dbf'])
+        prj_file = st.file_uploader("🌐 Projection File (.prj)", type=['prj'])
+        
+        if shp_file and shx_file and dbf_file:
+            use_custom_shapefile = True
+            st.success("✅ Required files uploaded!")
+        else:
+            use_custom_shapefile = False
+            st.info("📤 Please upload .shp, .shx, and .dbf files")
+    
+    # Date selection (shared across all tabs)
+    st.subheader("📅 Date Selection")
+    current_year = datetime.now().year
+    
+    available_years = list(range(1981, current_year))
+    
+    # Year multiselect
+    selected_years = st.multiselect(
+        "Select Years",
+        options=available_years,
+        default=[current_year - 3, current_year - 2, current_year - 1],
+        help="Select specific years for analysis"
+    )
+    
+    # Month multiselect in calendar order
+    selected_months = st.multiselect(
+        "Select Months", 
+        options=list(month_names.keys()),
+        format_func=lambda x: month_names[x],
+        default=[6, 7, 8, 9],
+        help="Select months for analysis (Jun-Sep for peak malaria season)"
+    )
+    
+    # Analysis options (for visualization tabs)
+    if st.session_state.processed_data:
+        st.subheader("🎨 Visualization Options")
+        color_scheme = st.selectbox("Color Scheme", ["Blues", "viridis", "plasma", "YlOrRd", "Reds"])
+        show_statistics = st.checkbox("📈 Show Statistics", value=True)
+        
+        # Time series options
+        if len(st.session_state.processed_data) > 1:
+            st.subheader("📊 Time Series Options")
+            
+            # Region selection for time series
+            if st.session_state.gdf is not None:
+                name_columns = [col for col in st.session_state.gdf.columns if col.startswith('NAME_')]
+                
+                if name_columns:
+                    name_col = name_columns[-1]
+                    region_options = st.session_state.gdf[name_col].tolist()
+                    selected_region = st.selectbox("Select Region for Time Series", region_options)
+                    region_index = region_options.index(selected_region)
+                else:
+                    region_index = st.selectbox("Select Region (by index)", range(len(st.session_state.gdf)))
+                    selected_region = f"Region {region_index}"
+                
+                # Store in session state for use in other tabs
+                st.session_state.selected_region = selected_region
+                st.session_state.region_index = region_index
+            
+            # Years for comparison
+            available_comparison_years = sorted(list(set([k[0] for k in st.session_state.processed_data.keys()])))
+            selected_years_comparison = st.multiselect(
+                "Years for Comparison",
+                available_comparison_years,
+                default=available_comparison_years[-3:] if len(available_comparison_years) >= 3 else available_comparison_years,
+                help="Select years to compare in monthly analysis"
+            )
+            st.session_state.selected_years_comparison = selected_years_comparison
+
 # Create tabs for different functionalities
 tab1, tab2, tab3 = st.tabs(["📥 Download Data", "🗺️ Map Visualization", "📈 Time Series Analysis"])
 
 with tab1:
     st.header("Download Rainfall Data")
-    
-    # Sidebar for controls
-    with st.sidebar:
-        st.header("Analysis Parameters")
-        
-        # Data source selection
-        data_source = st.radio(
-            "📂 Select Data Source", 
-            ["GADM Database", "Upload Custom Shapefile"],
-            help="Choose between official GADM boundaries or upload your own shapefile"
-        )
-        st.session_state.data_source = data_source
-        
-        if data_source == "GADM Database":
-            country = st.selectbox("🌍 Select Country", list(COUNTRY_OPTIONS.keys()), 
-                                  help="Select any African country")
-            admin_level = st.selectbox("🏛️ Administrative Level", [0, 1, 2, 3, 4], 
-                                      help="0=Country, 1=Regions, 2=Districts, 3=Communes, 4=Localities")
-            
-            country_code = COUNTRY_OPTIONS[country]
-            use_custom_shapefile = False
-            
-            st.session_state.country = country
-            st.session_state.country_code = country_code
-            st.session_state.admin_level = admin_level
-            st.session_state.use_custom_shapefile = False
-            
-        else:
-            st.markdown("**📁 Upload Shapefile Components**")
-            
-            shp_file = st.file_uploader("🗺️ Shapefile (.shp)", type=['shp'])
-            shx_file = st.file_uploader("🔍 Shape Index (.shx)", type=['shx'])
-            dbf_file = st.file_uploader("📊 Attribute Table (.dbf)", type=['dbf'])
-            prj_file = st.file_uploader("🌐 Projection File (.prj)", type=['prj'])
-            
-            if shp_file and shx_file and dbf_file:
-                use_custom_shapefile = True
-                st.success("✅ Required files uploaded!")
-            else:
-                use_custom_shapefile = False
-                st.info("📤 Please upload .shp, .shx, and .dbf files")
-        
-        # Date selection
-        st.subheader("📅 Date Selection")
-        current_year = datetime.now().year
-        
-        available_years = list(range(1981, current_year))
-        
-        # Year multiselect
-        selected_years = st.multiselect(
-            "Select Years",
-            options=available_years,
-            default=[current_year - 3, current_year - 2, current_year - 1],
-            help="Select specific years for analysis"
-        )
-        
-        # Month multiselect in calendar order
-        selected_months = st.multiselect(
-            "Select Months", 
-            options=list(month_names.keys()),
-            format_func=lambda x: month_names[x],
-            default=[6, 7, 8, 9],
-            help="Select months for analysis (Jun-Sep for peak malaria season)"
-        )
     
     # Main download section
     st.subheader("📥 Process & Download Rainfall Data")
@@ -730,6 +767,102 @@ with tab1:
             st.metric("🗓️ Months", len(selected_months))
         else:
             st.info("Select years and months to see processing estimates")
+                                st.caption("Statistical summary without raw data")
+                                
+                                summary_buffer = BytesIO()
+                                
+                                monthly_summary = []
+                                yearly_summary = []
+                                
+                                for month in selected_months:
+                                    month_data = final_df[final_df['month'] == month]['mean_rain'].dropna()
+                                    if len(month_data) > 0:
+                                        monthly_summary.append({
+                                            'Month': month_names[month],
+                                            'Mean': round(month_data.mean(), 2),
+                                            'Std': round(month_data.std(), 2),
+                                            'Min': round(month_data.min(), 2),
+                                            'Max': round(month_data.max(), 2),
+                                            'Q25': round(month_data.quantile(0.25), 2),
+                                            'Q75': round(month_data.quantile(0.75), 2),
+                                            'Count': len(month_data)
+                                        })
+                                
+                                for year in selected_years:
+                                    year_data = final_df[final_df['year'] == year]['mean_rain'].dropna()
+                                    if len(year_data) > 0:
+                                        yearly_summary.append({
+                                            'Year': year,
+                                            'Mean': round(year_data.mean(), 2),
+                                            'Std': round(year_data.std(), 2),
+                                            'Min': round(year_data.min(), 2),
+                                            'Max': round(year_data.max(), 2),
+                                            'Q25': round(year_data.quantile(0.25), 2),
+                                            'Q75': round(year_data.quantile(0.75), 2),
+                                            'Count': len(year_data)
+                                        })
+                                
+                                with pd.ExcelWriter(summary_buffer, engine='openpyxl') as writer:
+                                    if monthly_summary:
+                                        pd.DataFrame(monthly_summary).to_excel(writer, sheet_name='Monthly_Stats', index=False)
+                                    if yearly_summary:
+                                        pd.DataFrame(yearly_summary).to_excel(writer, sheet_name='Yearly_Stats', index=False)
+                                
+                                summary_buffer.seek(0)
+                                
+                                st.download_button(
+                                    label="📈 Download Summary",
+                                    data=summary_buffer.getvalue(),
+                                    file_name=f"summary_{filename_base}.xlsx",
+                                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                    use_container_width=True
+                                )
+                            
+                            with st.expander("👀 Preview Downloaded Data"):
+                                st.dataframe(final_df.head(15), use_container_width=True)
+                                st.caption(f"Showing first 15 rows of {len(final_df)} total records")
+                            
+                            with st.expander("📋 Individual Dataset Downloads"):
+                                st.caption("Download specific year/month combinations")
+                                
+                                individual_cols = st.columns(4)
+                                for i, (key, gdf_processed) in enumerate(st.session_state.processed_data.items()):
+                                    year, month = key
+                                    
+                                    df_individual = pd.DataFrame(gdf_processed.drop(columns='geometry'))
+                                    df_individual['year'] = year
+                                    df_individual['month'] = month
+                                    df_individual['month_name'] = month_names[month]
+                                    
+                                    csv_individual = df_individual.to_csv(index=False)
+                                    filename_individual = f"chirps_{st.session_state.country_code}_{year}_{month:02d}.csv"
+                                    
+                                    with individual_cols[i % 4]:
+                                        st.download_button(
+                                            label=f"{month_names[month][:3]} {year}",
+                                            data=csv_individual,
+                                            file_name=filename_individual,
+                                            mime="text/csv",
+                                            key=f"individual_{year}_{month}",
+                                            use_container_width=True
+                                        )
+                        
+                        else:
+                            st.error("No valid data was processed.")
+                    
+                    else:
+                        st.error("❌ No data could be processed for the selected time periods.")
+                
+                except Exception as e:
+                    st.error(f"❌ Error during processing: {str(e)}")
+    
+    with col2:
+        if selected_years and selected_months:
+            st.metric("📊 Total Datasets", len(selected_years) * len(selected_months))
+            st.metric("📅 Years", len(selected_years))
+            st.metric("🗓️ Months", len(selected_months))
+        else:
+            st.info("Select years and months to see processing estimates")
 
 with tab2:
     st.header("Interactive Map Visualization")
@@ -737,57 +870,194 @@ with tab2:
     if not st.session_state.processed_data:
         st.info("🔄 Please process and download data in the 'Download Data' tab first")
     else:
-        col1, col2, col3 = st.columns(3)
+        # Map visualization options
+        st.subheader("🗺️ Map Display Options")
+        
+        col1, col2 = st.columns(2)
         
         with col1:
-            available_years = sorted(list(set([k[0] for k in st.session_state.processed_data.keys()])))
-            selected_year = st.selectbox("Select Year", available_years)
+            map_display_type = st.radio(
+                "Select Display Type",
+                ["Single Map", "Multiple Maps (Subplots)"],
+                help="Choose between single map or multiple maps in subplots"
+            )
         
         with col2:
-            available_months = sorted(list(set([k[1] for k in st.session_state.processed_data.keys() if k[0] == selected_year])))
-            selected_month = st.selectbox("Select Month", available_months, format_func=lambda x: month_names[x])
-        
-        with col3:
-            color_scheme = st.selectbox("Color Scheme", ["Blues", "viridis", "plasma", "YlOrRd", "Reds"])
-        
-        if (selected_year, selected_month) in st.session_state.processed_data:
-            gdf_to_plot = st.session_state.processed_data[(selected_year, selected_month)]
-            title = f"{st.session_state.country} - {month_names[selected_month]} {selected_year}"
-            
-            fig, ax = plt.subplots(1, 1, figsize=(12, 8))
-            
-            if not gdf_to_plot['mean_rain'].isna().all():
-                gdf_to_plot.plot(
-                    column="mean_rain",
-                    ax=ax,
-                    legend=True,
-                    cmap=color_scheme,
-                    edgecolor="white",
-                    linewidth=0.5,
-                    legend_kwds={"shrink": 0.8, "label": "Rainfall (mm)"},
-                    missing_kwds={"color": "lightgray", "label": "No data"}
-                )
-            else:
-                gdf_to_plot.plot(ax=ax, color="lightgray", edgecolor="white")
-                ax.text(0.5, 0.5, 'No data available', ha='center', va='center', transform=ax.transAxes)
-            
-            ax.set_title(title, fontsize=16, fontweight='bold')
-            ax.set_axis_off()
-            
-            st.pyplot(fig)
-            
-            valid_data = gdf_to_plot['mean_rain'].dropna()
-            if len(valid_data) > 0:
-                col1, col2, col3, col4 = st.columns(4)
+            if map_display_type == "Single Map":
+                # Single map controls
+                available_years = sorted(list(set([k[0] for k in st.session_state.processed_data.keys()])))
+                selected_year_map = st.selectbox("Select Year", available_years, key="single_year")
                 
-                with col1:
-                    st.metric("Mean Rainfall", f"{valid_data.mean():.1f} mm")
-                with col2:
-                    st.metric("Max Rainfall", f"{valid_data.max():.1f} mm")
-                with col3:
-                    st.metric("Min Rainfall", f"{valid_data.min():.1f} mm")
-                with col4:
-                    st.metric("Std Deviation", f"{valid_data.std():.1f} mm")
+                available_months = sorted(list(set([k[1] for k in st.session_state.processed_data.keys() if k[0] == selected_year_map])))
+                selected_month_map = st.selectbox("Select Month", available_months, format_func=lambda x: month_names[x], key="single_month")
+            
+            else:
+                # Multiple maps controls
+                max_maps = min(12, len(st.session_state.processed_data))
+                num_maps = st.slider("Number of Maps", min_value=2, max_value=max_maps, value=min(6, max_maps))
+                
+                # Let user select which datasets to display
+                available_datasets = [(k[0], k[1]) for k in st.session_state.processed_data.keys()]
+                available_datasets.sort()
+                
+                selected_datasets = st.multiselect(
+                    "Select Datasets to Display",
+                    options=available_datasets,
+                    default=available_datasets[:num_maps],
+                    format_func=lambda x: f"{month_names[x[1]]} {x[0]}",
+                    max_selections=num_maps
+                )
+        
+        # Display maps based on selection
+        if map_display_type == "Single Map":
+            if (selected_year_map, selected_month_map) in st.session_state.processed_data:
+                gdf_to_plot = st.session_state.processed_data[(selected_year_map, selected_month_map)]
+                title = f"{st.session_state.country} - {month_names[selected_month_map]} {selected_year_map}"
+                
+                fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+                
+                if not gdf_to_plot['mean_rain'].isna().all():
+                    gdf_to_plot.plot(
+                        column="mean_rain",
+                        ax=ax,
+                        legend=True,
+                        cmap=color_scheme,
+                        edgecolor="white",
+                        linewidth=0.5,
+                        legend_kwds={"shrink": 0.8, "label": "Rainfall (mm)"},
+                        missing_kwds={"color": "lightgray", "label": "No data"}
+                    )
+                else:
+                    gdf_to_plot.plot(ax=ax, color="lightgray", edgecolor="white")
+                    ax.text(0.5, 0.5, 'No data available', ha='center', va='center', transform=ax.transAxes)
+                
+                ax.set_title(title, fontsize=16, fontweight='bold')
+                ax.set_axis_off()
+                
+                st.pyplot(fig)
+                
+                # Show statistics if enabled
+                if show_statistics:
+                    valid_data = gdf_to_plot['mean_rain'].dropna()
+                    if len(valid_data) > 0:
+                        col1, col2, col3, col4 = st.columns(4)
+                        
+                        with col1:
+                            st.metric("Mean Rainfall", f"{valid_data.mean():.1f} mm")
+                        with col2:
+                            st.metric("Max Rainfall", f"{valid_data.max():.1f} mm")
+                        with col3:
+                            st.metric("Min Rainfall", f"{valid_data.min():.1f} mm")
+                        with col4:
+                            st.metric("Std Deviation", f"{valid_data.std():.1f} mm")
+        
+        else:  # Multiple Maps (Subplots)
+            if selected_datasets:
+                # Calculate subplot layout
+                num_datasets = len(selected_datasets)
+                if num_datasets <= 2:
+                    num_cols = num_datasets
+                    num_rows = 1
+                elif num_datasets <= 4:
+                    num_cols = 2
+                    num_rows = 2
+                elif num_datasets <= 6:
+                    num_cols = 3
+                    num_rows = 2
+                elif num_datasets <= 9:
+                    num_cols = 3
+                    num_rows = 3
+                else:
+                    num_cols = 4
+                    num_rows = math.ceil(num_datasets / 4)
+                
+                fig, axes = plt.subplots(num_rows, num_cols, figsize=(5 * num_cols, 4 * num_rows))
+                
+                # Handle single subplot case
+                if num_datasets == 1:
+                    axes = [axes]
+                elif num_rows == 1:
+                    axes = axes if num_cols > 1 else [axes]
+                else:
+                    axes = axes.flatten()
+                
+                # Calculate consistent color scale across all maps
+                all_values = []
+                for year, month in selected_datasets:
+                    if (year, month) in st.session_state.processed_data:
+                        gdf_temp = st.session_state.processed_data[(year, month)]
+                        valid_values = gdf_temp['mean_rain'].dropna()
+                        all_values.extend(valid_values)
+                
+                if all_values:
+                    vmin, vmax = np.percentile(all_values, [5, 95])
+                else:
+                    vmin, vmax = 0, 100
+                
+                # Plot each selected dataset
+                for i, (year, month) in enumerate(selected_datasets):
+                    ax = axes[i]
+                    
+                    if (year, month) in st.session_state.processed_data:
+                        gdf_to_plot = st.session_state.processed_data[(year, month)]
+                        
+                        if not gdf_to_plot['mean_rain'].isna().all():
+                            gdf_to_plot.plot(
+                                column="mean_rain",
+                                ax=ax,
+                                legend=True,
+                                cmap=color_scheme,
+                                edgecolor="white",
+                                linewidth=0.5,
+                                legend_kwds={"shrink": 0.6, "label": "Rainfall (mm)"},
+                                vmin=vmin,
+                                vmax=vmax,
+                                missing_kwds={"color": "lightgray", "label": "No data"}
+                            )
+                        else:
+                            gdf_to_plot.plot(ax=ax, color="lightgray", edgecolor="white")
+                            ax.text(0.5, 0.5, 'No data available', ha='center', va='center', transform=ax.transAxes)
+                        
+                        ax.set_title(f"{month_names[month]} {year}", fontweight='bold', fontsize=12)
+                    else:
+                        ax.text(0.5, 0.5, f'Data not available\n{month_names[month]} {year}', 
+                               ha='center', va='center', transform=ax.transAxes)
+                        ax.set_title(f"{month_names[month]} {year}", fontweight='bold', fontsize=12)
+                    
+                    ax.set_axis_off()
+                
+                # Remove empty subplots
+                for j in range(len(selected_datasets), len(axes)):
+                    fig.delaxes(axes[j])
+                
+                plt.suptitle(f"{st.session_state.country} - Rainfall Comparison", fontsize=16, fontweight='bold', y=0.98)
+                plt.tight_layout()
+                
+                st.pyplot(fig)
+                
+                # Show comparative statistics if enabled
+                if show_statistics:
+                    st.subheader("📊 Comparative Statistics")
+                    
+                    stats_data = []
+                    for year, month in selected_datasets:
+                        if (year, month) in st.session_state.processed_data:
+                            gdf_temp = st.session_state.processed_data[(year, month)]
+                            valid_data = gdf_temp['mean_rain'].dropna()
+                            
+                            if len(valid_data) > 0:
+                                stats_data.append({
+                                    'Period': f"{month_names[month]} {year}",
+                                    'Mean (mm)': f"{valid_data.mean():.1f}",
+                                    'Std (mm)': f"{valid_data.std():.1f}",
+                                    'Min (mm)': f"{valid_data.min():.1f}",
+                                    'Max (mm)': f"{valid_data.max():.1f}",
+                                    'Valid Areas': len(valid_data)
+                                })
+                    
+                    if stats_data:
+                        stats_df = pd.DataFrame(stats_data)
+                        st.dataframe(stats_df, use_container_width=True)
 
 with tab3:
     st.header("Time Series Analysis")
@@ -804,17 +1074,12 @@ with tab3:
         if analysis_type == "Regional Time Series":
             st.subheader("📈 Regional Rainfall Time Series")
             
-            if st.session_state.gdf is not None:
-                name_columns = [col for col in st.session_state.gdf.columns if col.startswith('NAME_')]
+            # Use region selection from sidebar if available
+            if hasattr(st.session_state, 'selected_region') and hasattr(st.session_state, 'region_index'):
+                selected_region = st.session_state.selected_region
+                region_index = st.session_state.region_index
                 
-                if name_columns:
-                    name_col = name_columns[-1]
-                    region_options = st.session_state.gdf[name_col].tolist()
-                    selected_region = st.selectbox("Select Region", region_options)
-                    region_index = region_options.index(selected_region)
-                else:
-                    region_index = st.selectbox("Select Region (by index)", range(len(st.session_state.gdf)))
-                    selected_region = f"Region {region_index}"
+                st.info(f"📍 Analyzing: **{selected_region}** (Change selection in sidebar)")
                 
                 fig = create_time_series_plot(st.session_state.processed_data, selected_region, region_index)
                 
@@ -837,18 +1102,30 @@ with tab3:
                         if time_series_data:
                             df_display = pd.DataFrame(time_series_data)
                             st.dataframe(df_display, use_container_width=True)
+            else:
+                st.warning("⚠️ Please select a region in the sidebar first, or process data to enable region selection.")
         
         elif analysis_type == "Monthly Comparison":
             st.subheader("📊 Monthly Rainfall Comparison")
             
-            available_years = sorted(list(set([k[0] for k in st.session_state.processed_data.keys()])))
-            selected_years_comparison = st.multiselect(
-                "Select Years to Compare",
-                available_years,
-                default=available_years[-3:] if len(available_years) >= 3 else available_years
-            )
-            
-            if selected_years_comparison:
+            # Use years from sidebar if available
+            if hasattr(st.session_state, 'selected_years_comparison'):
+                selected_years_comparison = st.session_state.selected_years_comparison
+                
+                if selected_years_comparison:
+                    st.info(f"📅 Comparing years: **{', '.join(map(str, selected_years_comparison))}** (Change selection in sidebar)")
+                    
+                    fig = create_monthly_comparison_plot(st.session_state.processed_data, selected_years_comparison)
+                    
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.warning("⚠️ Please select years for comparison in the sidebar.")
+            else:
+                # Fallback to default selection
+                available_years = sorted(list(set([k[0] for k in st.session_state.processed_data.keys()])))
+                selected_years_comparison = available_years[-3:] if len(available_years) >= 3 else available_years
+                
                 fig = create_monthly_comparison_plot(st.session_state.processed_data, selected_years_comparison)
                 
                 if fig:
