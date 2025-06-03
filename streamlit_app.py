@@ -517,29 +517,33 @@ with tab1:
         st.subheader("📅 Date Selection")
         current_year = datetime.now().year
         
-        # Year multiselect
-        available_years = list(range(1981, current_year))
-        selected_years = st.multiselect(
-            "Select Years",
-            options=available_years,
-            default=[current_year - 3, current_year - 2, current_year - 1],
-            help="Select specific years for analysis"
-        )
+        # Year selection with checkboxes
+        st.markdown("**Select Years:**")
+        selected_years = []
         
-        # Month selection
-        month_names = {
-            1: "January", 2: "February", 3: "March", 4: "April",
-            5: "May", 6: "June", 7: "July", 8: "August",
-            9: "September", 10: "October", 11: "November", 12: "December"
-        }
+        # Create columns for year checkboxes (5 per row)
+        years_per_row = 5
+        year_chunks = [available_years[i:i + years_per_row] for i in range(0, len(available_years), years_per_row)]
         
-        selected_months = st.multiselect(
-            "📊 Select Months", 
-            options=list(month_names.keys()),
-            format_func=lambda x: month_names[x],
-            default=[6, 7, 8, 9],
-            help="Select months for analysis"
-        )
+        for chunk in year_chunks:
+            cols = st.columns(len(chunk))
+            for i, year in enumerate(chunk):
+                with cols[i]:
+                    if st.checkbox(str(year), key=f"year_{year}"):
+                        selected_years.append(year)
+        
+        # Month selection with checkboxes in order
+        st.markdown("**Select Months:**")
+        selected_months = []
+        
+        # Display months in calendar order with checkboxes
+        month_cols = st.columns(4)  # 3 months per row
+        for i, (month_num, month_name) in enumerate(month_names.items()):
+            with month_cols[i % 4]:
+                # Default selection for peak malaria season
+                default_checked = month_num in [6, 7, 8, 9]
+                if st.checkbox(month_name, key=f"month_{month_num}", value=default_checked):
+                    selected_months.append(month_num)
     
     # Main download section
     st.subheader("📥 Process & Download Rainfall Data")
