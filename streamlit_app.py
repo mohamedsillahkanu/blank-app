@@ -440,13 +440,13 @@ with col1:
         elif st.session_state.data_source == "Upload Custom Shapefile" and not st.session_state.use_custom_shapefile:
             st.error("Please upload all required shapefile components (.shp, .shx, .dbf)")
         else:
-            # Progress tracking
-            progress_placeholder = st.empty()
-            status_placeholder = st.empty()
+            # Progress tracking - use simpler approach to avoid ElementNode conflicts
+            progress_container = st.container()
+            status_container = st.container()
             
-            with progress_placeholder.container():
+            with progress_container:
                 progress_bar = st.progress(0)
-            with status_placeholder.container():
+            with status_container:
                 status_text = st.empty()
             
             try:
@@ -546,18 +546,15 @@ with col1:
                 status_text.text("📊 Generating maps...")
                 progress_bar.progress(90)
                 
-                # Clear progress indicators before showing results
+                # Complete the analysis
                 progress_bar.progress(100)
                 status_text.text("✅ Analysis complete!")
                 
-                # Add a small delay to ensure the completion message is visible
-                time.sleep(1)
+                # Brief pause then clear status (keep progress bar)
+                time.sleep(0.5)
+                status_text.empty()
                 
-                # Clear the progress indicators to make room for results
-                progress_placeholder.empty()
-                status_placeholder.empty()
-                
-                # Now display the results permanently
+                # Show permanent success message
                 st.success(f"🎉 Analysis completed successfully for {st.session_state.country} ({year})!")
                 
                 # Create subplots
@@ -971,7 +968,7 @@ with col2:
     with st.expander("📊 System Information"):
         current_year = datetime.now().year
         st.write(f"Current time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        st.write("Available years: 1981-{current_year}")
+        st.write(f"Available years: 1981-{current_year}")
         st.write(f"Countries available: {len(COUNTRY_OPTIONS)}")
         st.write("2025: Jan-May (embedded) | Other years: All 12 months")
         st.write("Month selection: Fully automated")
@@ -983,3 +980,4 @@ with col2:
 st.markdown("---")
 st.markdown("*Built for malaria researchers and public health professionals*")
 st.markdown("**Contact**: Mohamed Sillah Kanu | Informarics Consultancy Firm- Sierra Leone (ICF-SL)")
+st.markdown("**Email**:mohamed.kanu@informaticsconsultancyfirm.com")
