@@ -405,28 +405,25 @@ with st.sidebar:
     current_year = datetime.now().year
     year = st.selectbox("📅 Select Year", range(1981, current_year + 1), index=current_year-1981-2)
 
-    # Month selection - CONDITIONAL LOGIC FOR 2025
+    # Month names mapping
     month_names = {
         1: "January", 2: "February", 3: "March", 4: "April",
         5: "May", 6: "June", 7: "July", 8: "August",
         9: "September", 10: "October", 11: "November", 12: "December"
     }
     
-    # Check if this is 2025 - if so, use embedded months, otherwise show selection
+    # AUTOMATIC MONTH SELECTION - NO USER INTERFACE
+    # All months automatically selected for ALL years
     if is_embedded_2025(year):
-        # For 2025, automatically use embedded months (Jan-May) - NO USER SELECTION
+        # For 2025, use embedded months (Jan-May)
         selected_months = get_embedded_months_for_2025()
-        st.info(f"📊 **2025 Analysis**: Automatically analyzing {', '.join([month_names[m] for m in selected_months])}")
-        st.caption("For 2025, months are pre-selected for comprehensive analysis")
+        st.info(f"📊 **{year} Analysis**: Automatically analyzing {', '.join([month_names[m] for m in selected_months])}")
+        st.caption("Comprehensive analysis with pre-selected months")
     else:
-        # For all other years, show the regular month selection
-        selected_months = st.multiselect(
-            "📊 Select Months", 
-            options=list(month_names.keys()),
-            format_func=lambda x: month_names[x],
-            default=[6, 7, 8, 9],  # Peak malaria season
-            help="Select months for analysis (typically Jun-Sep for West Africa)"
-        )
+        # For all other years, automatically select all 12 months
+        selected_months = list(range(1, 13))  # All months: 1-12
+        st.info(f"📊 **{year} Full Year Analysis**: Automatically analyzing all 12 months")
+        st.caption("Complete annual rainfall analysis (January through December)")
 
     # Analysis options
     st.subheader("Display Options")
@@ -872,12 +869,12 @@ with col2:
     with st.expander("📋 Usage Tips"):
         st.markdown("""
         - **Years**: Full selection 1981-current available
-        - **2025 Special**: Months automatically selected (Jan-May)
-        - **Other years**: Manual month selection available
-        - **Peak season**: Jun-Sep for West Africa
+        - **2025 Special**: Jan-May automatically selected
+        - **Other years**: All 12 months automatically selected
+        - **No month selection**: Streamlined user experience
         - **Admin levels**: Use level 2 for districts
         - **Color schemes**: Blues for rainfall, viridis for diversity
-        - **Performance**: Fewer months = faster processing
+        - **Performance**: All months processed automatically
         - **Large countries**: Use higher admin levels for better detail
         - **Downloads**: CSV for analysis, Excel for reports with metadata
         - **Projection files**: Always include .prj files with custom shapefiles for best results
@@ -889,18 +886,14 @@ with col2:
         
         **Month Selection:**
         - **2025**: Jan, Feb, Mar, Apr, May (automatic)
-        - **All other years**: Manual selection available
-        - **Typical selections**: 
-          - Jun-Sep: Peak malaria season (West Africa)
-          - Dec-Feb: Dry season
-          - Mar-May: Pre-rainy season
-          - Jun-Nov: Rainy season
+        - **All other years**: All 12 months (automatic)
+        - **No manual selection**: Streamlined for comprehensive analysis
         
-        **2025 Benefits:**
-        - Comprehensive early-year analysis
-        - No selection confusion
-        - Consistent methodology
-        - Complete first-half coverage
+        **Benefits:**
+        - **2025**: Focused early-year analysis
+        - **Other years**: Complete annual coverage
+        - **No confusion**: Automatic month selection
+        - **Comprehensive**: Full temporal coverage
         """)
     
     with st.expander("🌐 Projection File (.prj) Benefits"):
