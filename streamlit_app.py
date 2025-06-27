@@ -68,7 +68,7 @@ COUNTRY_OPTIONS = {
 
 # BACKEND CONFIGURATION FOR 2025 EMBEDDED MONTHS
 # ==============================================
-EMBEDDED_2025_MONTHS = [1, 2, 3, 4, 5]  # Jan, Feb, Mar, Apr, May for 2025
+EMBEDDED_2025_MONTHS = [1, 2, 3, 4]  # Jan, Feb, Mar, Apr, May for 2025
 
 def is_embedded_2025(year):
     """Check if this is 2025 and should use embedded months"""
