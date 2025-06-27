@@ -23,47 +23,110 @@ st.set_page_config(
 )
 
 # Define country codes globally - THIS MUST BE AT TOP LEVEL
+# Countries arranged in alphabetical order
 COUNTRY_OPTIONS = {
-    "Sierra Leone": "SLE",
-    "Gambia": "GMB",
-    "Guinea": "GIN", 
-    "Mali": "MLI",
-    "Burkina Faso": "BFA",
-    "Niger": "NER",
-    "Ghana": "GHA",
-    "Ivory Coast": "CIV",
-    "Liberia": "LBR",
-    "Senegal": "SEN",
-    "Guinea-Bissau": "GNB",
-    "Mauritania": "MRT",
-    "Nigeria": "NGA",
+    "Angola": "AGO",
     "Benin": "BEN",
-    "Togo": "TGO",
-    "Chad": "TCD",
+    "Botswana": "BWA",
+    "Burkina Faso": "BFA",
+    "Burundi": "BDI",
     "Cameroon": "CMR",
     "Central African Republic": "CAF",
-    "Gabon": "GAB",
-    "Equatorial Guinea": "GNQ",
-    "Republic of the Congo": "COG",
+    "Chad": "TCD",
     "Democratic Republic of the Congo": "COD",
-    "Angola": "AGO",
-    "Zambia": "ZMB",
-    "Kenya": "KEN",
-    "Tanzania": "TZA",
-    "Uganda": "UGA",
-    "Rwanda": "RWA",
-    "Burundi": "BDI",
+    "Equatorial Guinea": "GNQ",
     "Ethiopia": "ETH",
+    "Gabon": "GAB",
+    "Gambia": "GMB",
+    "Ghana": "GHA",
+    "Guinea": "GIN",
+    "Guinea-Bissau": "GNB",
+    "Ivory Coast": "CIV",
+    "Kenya": "KEN",
+    "Liberia": "LBR",
+    "Madagascar": "MDG",
+    "Malawi": "MWI",
+    "Mali": "MLI",
+    "Mauritania": "MRT",
+    "Mozambique": "MOZ",
+    "Namibia": "NAM",
+    "Niger": "NER",
+    "Nigeria": "NGA",
+    "Republic of the Congo": "COG",
+    "Rwanda": "RWA",
+    "Senegal": "SEN",
+    "Sierra Leone": "SLE",
+    "South Africa": "ZAF",
     "South Sudan": "SSD",
     "Sudan": "SDN",
-    "Madagascar": "MDG",
-    "Mozambique": "MOZ",
-    "Malawi": "MWI",
-    "Zimbabwe": "ZWE",
-    "Botswana": "BWA",
-    "Namibia": "NAM",
-    "South Africa": "ZAF"
+    "Tanzania": "TZA",
+    "Togo": "TGO",
+    "Uganda": "UGA",
+    "Zambia": "ZMB",
+    "Zimbabwe": "ZWE"
 }
+
+# BACKEND CONFIGURATION - EASILY MODIFIABLE
+# ==============================================
+# Configuration for embedded months (modify this section to add/remove months)
+EMBEDDED_CONFIG = {
+    "year": 2025,
+    "available_months": [1, 2, 3, 4],  # Add more months here as they become available
+    "default_months": [1, 2, 3, 4],   # Default selection
+    "data_status": {
+        1: "available",   # January - available
+        2: "available",   # February - available  
+        3: "available",   # March - available
+        4: "available",   # April - available
+        5: "pending",     # May - pending
+        6: "pending",     # June - pending
+        7: "pending",     # July - pending
+        8: "pending",     # August - pending
+        9: "pending",     # September - pending
+        10: "pending",    # October - pending
+        11: "pending",    # November - pending
+        12: "pending"     # December - pending
+    }
+}
+
+# Month names mapping
+MONTH_NAMES = {
+    1: "January", 2: "February", 3: "March", 4: "April",
+    5: "May", 6: "June", 7: "July", 8: "August",
+    9: "September", 10: "October", 11: "November", 12: "December"
+}
+
+# Function to get available months from backend config
+def get_available_months():
+    """Get list of available months from backend configuration"""
+    return EMBEDDED_CONFIG["available_months"]
+
+def get_pending_months():
+    """Get list of pending months from backend configuration"""
+    return [month for month, status in EMBEDDED_CONFIG["data_status"].items() 
+            if status == "pending"]
+
+def add_month_to_backend(month_number):
+    """
+    Backend function to add a new month when data becomes available
+    This function should be called when new CHIRPS data is released
+    """
+    if month_number not in EMBEDDED_CONFIG["available_months"]:
+        EMBEDDED_CONFIG["available_months"].append(month_number)
+        EMBEDDED_CONFIG["available_months"].sort()
+        EMBEDDED_CONFIG["data_status"][month_number] = "available"
+        print(f"Month {month_number} ({MONTH_NAMES[month_number]}) added to available months")
+    
+def update_embedded_year(new_year):
+    """
+    Backend function to update the embedded year
+    """
+    EMBEDDED_CONFIG["year"] = new_year
+    print(f"Embedded year updated to {new_year}")
+
+# ==============================================
+# END BACKEND CONFIGURATION
+# ==============================================
 
 # Initialize session state variables to avoid NameError
 if 'data_source' not in st.session_state:
@@ -279,9 +342,28 @@ def process_chirps_data(_gdf, year, month):
 st.title("🌧️ CHIRPS Rainfall Data Analysis and Map Generation")
 st.markdown("*Analyze seasonal rainfall patterns for malaria intervention planning*")
 
+# Show embedded year info
+st.info(f"📅 **Analysis Year: {EMBEDDED_CONFIG['year']}** | Available months: {', '.join([MONTH_NAMES[m] for m in get_available_months()])}")
+
 # Sidebar for controls
 with st.sidebar:
     st.header("Analysis Parameters")
+    
+    # Show current embedded configuration
+    st.markdown(f"**🗓️ Embedded Year: {EMBEDDED_CONFIG['year']}**")
+    
+    available_months = get_available_months()
+    pending_months = get_pending_months()
+    
+    if pending_months:
+        with st.expander("📊 Data Status"):
+            st.write("**Available Months:**")
+            for month in available_months:
+                st.write(f"✅ {MONTH_NAMES[month]}")
+            
+            st.write("**Pending Months:**")
+            for month in pending_months:
+                st.write(f"⏳ {MONTH_NAMES[month]} (Coming soon)")
     
     # Data source selection
     data_source = st.radio(
@@ -386,24 +468,27 @@ with st.sidebar:
         st.session_state.admin_level = admin_level
         st.session_state.use_custom_shapefile = use_custom_shapefile
 
-    # Date selection with validation
-    current_year = datetime.now().year
-    year = st.selectbox("📅 Select Year", range(1981, current_year + 1), index=current_year-1981-2)
-
-    # Month selection with names
-    month_names = {
-        1: "January", 2: "February", 3: "March", 4: "April",
-        5: "May", 6: "June", 7: "July", 8: "August",
-        9: "September", 10: "October", 11: "November", 12: "December"
-    }
+    # EMBEDDED MONTH SELECTION - NO DATE PICKER
+    st.subheader("📊 Month Selection")
     
+    # Get available months for the embedded year
+    available_months = get_available_months()
+    
+    # Create month selection using the embedded configuration
     selected_months = st.multiselect(
-        "📊 Select Months", 
-        options=list(month_names.keys()),
-        format_func=lambda x: month_names[x],
-        default=[6, 7, 8, 9],  # Peak malaria season
-        help="Select months for analysis (typically Jun-Sep for West Africa)"
+        f"Select Months for {EMBEDDED_CONFIG['year']}", 
+        options=available_months,
+        format_func=lambda x: MONTH_NAMES[x],
+        default=EMBEDDED_CONFIG["default_months"],
+        help=f"Available months for {EMBEDDED_CONFIG['year']} analysis"
     )
+    
+    # Display information about data availability
+    if len(available_months) < 12:
+        st.info(f"📈 **Data Status**: {len(available_months)}/12 months available for {EMBEDDED_CONFIG['year']}")
+        remaining_months = [m for m in range(1, 13) if m not in available_months]
+        if remaining_months:
+            st.caption(f"Coming soon: {', '.join([MONTH_NAMES[m] for m in remaining_months[:3]])}{'...' if len(remaining_months) > 3 else ''}")
 
     # Analysis options
     st.subheader("Display Options")
@@ -420,6 +505,9 @@ with col1:
         elif st.session_state.data_source == "Upload Custom Shapefile" and not st.session_state.use_custom_shapefile:
             st.error("Please upload all required shapefile components (.shp, .shx, .dbf)")
         else:
+            # Use the embedded year
+            year = EMBEDDED_CONFIG["year"]
+            
             # Progress tracking
             progress_bar = st.progress(0)
             status_text = st.empty()
@@ -476,7 +564,7 @@ with col1:
                     test_response = requests.head(test_url, timeout=30)
                     if test_response.status_code != 200:
                         st.error(f"❌ CHIRPS data not available for {year}-{test_month:02d}")
-                        st.error("Try selecting a different year or check if the data exists for your selected period.")
+                        st.error("Try selecting a different month or check if the data exists for your selected period.")
                         st.stop()
                 except requests.exceptions.RequestException as e:
                     st.error(f"❌ Cannot access CHIRPS server: {str(e)}")
@@ -489,13 +577,13 @@ with col1:
                 for i, month in enumerate(selected_months):
                     progress = 20 + (60 * (i + 1) / len(selected_months))
                     progress_bar.progress(int(progress))
-                    status_text.text(f"🌧️ Processing {month_names[month]} {year}...")
+                    status_text.text(f"🌧️ Processing {MONTH_NAMES[month]} {year}...")
                     
                     try:
                         processed_gdf = process_chirps_data(gdf, year, month)
                         processed_data.append((month, processed_gdf))
                     except Exception as e:
-                        st.error(f"❌ Error processing {month_names[month]}: {str(e)}")
+                        st.error(f"❌ Error processing {MONTH_NAMES[month]}: {str(e)}")
                         st.write(f"Debug: Error type: {type(e).__name__}")
                         continue
 
@@ -503,7 +591,7 @@ with col1:
                     st.error("❌ No data could be processed for the selected months.")
                     st.markdown("""
                     **Possible solutions:**
-                    - Try a different year (1981-2023 are most reliable)
+                    - Try a different month from the available list
                     - Check if the selected months have data available
                     - Ensure internet connection is stable
                     - Try fewer months at once
@@ -544,9 +632,9 @@ with col1:
                     # Handle missing data
                     plot_data = processed_gdf.copy()
                     if plot_data['mean_rain'].isna().all():
-                        ax.text(0.5, 0.5, f'No data available\nfor {month_names[month]} {year}', 
+                        ax.text(0.5, 0.5, f'No data available\nfor {MONTH_NAMES[month]} {year}', 
                                ha='center', va='center', transform=ax.transAxes)
-                        ax.set_title(f"{st.session_state.country} - {month_names[month]} {year}")
+                        ax.set_title(f"{st.session_state.country} - {MONTH_NAMES[month]} {year}")
                         ax.set_axis_off()
                         continue
                     
@@ -563,7 +651,7 @@ with col1:
                         vmax=vmax,
                         missing_kwds={"color": "lightgray", "label": "No data"}
                     )
-                    ax.set_title(f"{st.session_state.country} - {month_names[month]} {year}", fontweight='bold')
+                    ax.set_title(f"{st.session_state.country} - {MONTH_NAMES[month]} {year}", fontweight='bold')
                     ax.set_axis_off()
 
                 # Remove empty subplots
@@ -586,7 +674,7 @@ with col1:
                         valid_data = processed_gdf['mean_rain'].dropna()
                         if len(valid_data) > 0:
                             stats_data.append({
-                                'Month': month_names[month],
+                                'Month': MONTH_NAMES[month],
                                 'Mean (mm)': f"{valid_data.mean():.1f}",
                                 'Std (mm)': f"{valid_data.std():.1f}",
                                 'Min (mm)': f"{valid_data.min():.1f}",
@@ -607,10 +695,11 @@ with col1:
                     # Convert to regular DataFrame (drop geometry)
                     df = pd.DataFrame(processed_gdf.drop(columns='geometry'))
                     df['month'] = month
-                    df['month_name'] = month_names[month]
+                    df['month_name'] = MONTH_NAMES[month]
                     df['year'] = year
                     df['area_name'] = st.session_state.country
                     df['data_source'] = st.session_state.data_source
+                    df['analysis_type'] = 'embedded_months_2025'  # New field to identify embedded analysis
                     if st.session_state.data_source == "GADM Database":
                         df['country_code'] = st.session_state.country_code
                         df['admin_level'] = st.session_state.admin_level
@@ -624,7 +713,7 @@ with col1:
                             df['projection_source'] = "Assumed WGS84"
                     
                     # Reorder columns for better readability
-                    column_order = ['area_name', 'data_source', 'year', 'month', 'month_name']
+                    column_order = ['area_name', 'data_source', 'analysis_type', 'year', 'month', 'month_name']
                     
                     if st.session_state.data_source == "GADM Database":
                         column_order.extend(['country_code', 'admin_level'])
@@ -694,12 +783,14 @@ with col1:
                                 st.session_state.country, st.session_state.data_source, st.session_state.country_code, 
                                 str(st.session_state.admin_level) if st.session_state.data_source == "GADM Database" else "Custom",
                                 year,
-                                ', '.join([month_names[m] for m in selected_months]),
+                                ', '.join([MONTH_NAMES[m] for m in selected_months]),
                                 'CHIRPS v2.0',
                                 'GADM v4.1' if st.session_state.data_source == "GADM Database" else 'User Upload',
                                 datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                                 len(final_df),
-                                'CHIRPS Rainfall Analysis Tool v2.1'
+                                'CHIRPS Rainfall Analysis Tool v2.2 (Embedded Months)',
+                                'Embedded Analysis - 2025',
+                                f"{len(get_available_months())}/12 months available"
                             ]
                             
                             # Add projection info for custom uploads
@@ -712,7 +803,7 @@ with col1:
                             metadata_params = [
                                 'Area Name', 'Data Source', 'Country Code', 'Admin Level', 'Year', 
                                 'Months Analyzed', 'CHIRPS Source', 'Boundary Source', 'Generated On',
-                                'Total Records', 'Tool Version'
+                                'Total Records', 'Tool Version', 'Analysis Type', 'Data Availability'
                             ]
                             
                             if st.session_state.data_source == "Upload Custom Shapefile":
@@ -745,7 +836,8 @@ with col1:
                         **Core Columns:**
                         - `area_name`: Name of analysis area
                         - `data_source`: "GADM Database" or "Upload Custom Shapefile"
-                        - `year`: Analysis year
+                        - `analysis_type`: "embedded_months_2025" for this embedded analysis
+                        - `year`: Analysis year (embedded: 2025)
                         - `month`: Month number (1-12)
                         - `month_name`: Month name
                         
@@ -767,9 +859,10 @@ with col1:
                         - `mean_rain`: Average rainfall in mm for the administrative unit
                         - `valid_pixels`: Number of valid satellite pixels used in calculation
                         
-                        **Projection Information (Custom Shapefiles):**
-                        - Coordinate system detection improved with .prj file support
-                        - Better accuracy when .prj file is included
+                        **Embedded Analysis Features:**
+                        - Fixed year: 2025
+                        - Progressive month availability as data becomes available
+                        - Backend configuration for easy month management
                         """)
 
             except Exception as e:
@@ -779,6 +872,8 @@ with col1:
                 # Debug information
                 with st.expander("🔧 Debug Information"):
                     st.write(f"Data Source: {st.session_state.data_source}")
+                    st.write(f"Embedded Year: {EMBEDDED_CONFIG['year']}")
+                    st.write(f"Available Months: {get_available_months()}")
                     if st.session_state.data_source == "GADM Database":
                         st.write(f"Country: {st.session_state.country}")
                         st.write(f"Country Code: {st.session_state.country_code}")
@@ -788,24 +883,29 @@ with col1:
                         st.write(f"Files Uploaded: {st.session_state.use_custom_shapefile}")
                         if 'prj_file' in locals():
                             st.write(f"PRJ File: {'Yes' if prj_file else 'No'}")
-                    st.write(f"Year: {year}")
-                    st.write(f"Months: {selected_months}")
+                    st.write(f"Selected Months: {selected_months}")
 
 with col2:
     st.subheader("ℹ️ About This Tool")
-    st.markdown("""
-    **CHIRPS Rainfall Analysis Tool**
+    st.markdown(f"""
+    **CHIRPS Rainfall Analysis Tool v2.2**
     
-    This tool analyzes satellite-derived rainfall data for malaria intervention planning in Africa.
+    **🗓️ Embedded Analysis for {EMBEDDED_CONFIG['year']}**
+    
+    This version provides streamlined analysis for {EMBEDDED_CONFIG['year']} with progressive month availability.
     
     **Data Sources:**
     - **CHIRPS**: Climate Hazards Group InfraRed Precipitation with Station data
     - **GADM**: Global Administrative Areas database (official country boundaries)
     
+    **Current Status:**
+    - **Year**: {EMBEDDED_CONFIG['year']} (embedded)
+    - **Available**: {len(get_available_months())}/12 months
+    - **Latest**: {MONTH_NAMES[max(get_available_months())] if get_available_months() else 'None'}
+    
     **Coverage:**
     - All African countries supported
     - Administrative levels 0-4 (where available)
-    - Monthly rainfall data from 1981-present
     - Custom shapefile upload capability with .prj support
     
     **Use Cases:**
@@ -815,14 +915,49 @@ with col2:
     
     **Technical Notes:**
     - Data resolution: ~5km
-    - Temporal coverage: 1981-present
     - Update frequency: Monthly (~2 month delay)
     - Improved projection handling with .prj file support
     """)
     
-    with st.expander("📋 Usage Tips"):
+    # Backend Management Section (for administrators)
+    with st.expander("🔧 Backend Configuration"):
         st.markdown("""
-        - **Peak season**: Jun-Sep for West Africa
+        **For Administrators/Developers:**
+        
+        **Current Backend Settings:**
+        """)
+        st.code(f"""
+# Current Configuration
+EMBEDDED_CONFIG = {{
+    "year": {EMBEDDED_CONFIG['year']},
+    "available_months": {EMBEDDED_CONFIG['available_months']},
+    "default_months": {EMBEDDED_CONFIG['default_months']}
+}}
+
+# To add a new month (when data becomes available):
+add_month_to_backend(5)  # Adds May
+
+# To update the year:
+update_embedded_year(2026)
+        """, language="python")
+        
+        st.markdown("""
+        **How to Add New Months:**
+        1. Check CHIRPS data availability
+        2. Update `EMBEDDED_CONFIG["available_months"]`
+        3. Update `EMBEDDED_CONFIG["data_status"]`
+        4. Optionally update `default_months`
+        
+        **Automatic Updates:**
+        - Use the `add_month_to_backend()` function
+        - Backend validates data availability
+        - Updates both available months and status
+        """)
+    
+    with st.expander("📋 Usage Tips"):
+        st.markdown(f"""
+        - **Current year**: {EMBEDDED_CONFIG['year']} (fixed)
+        - **Available months**: {', '.join([MONTH_NAMES[m] for m in get_available_months()])}
         - **Admin levels**: Use level 2 for districts
         - **Color schemes**: Blues for rainfall, viridis for diversity
         - **Performance**: Fewer months = faster processing
@@ -851,6 +986,24 @@ with col2:
         - Most GIS software exports compatible .prj files
         """)
     
+    with st.expander("📊 Data Availability Timeline"):
+        st.markdown(f"""
+        **{EMBEDDED_CONFIG['year']} Data Release Schedule:**
+        
+        **Available Now:**
+        """)
+        
+        for month in get_available_months():
+            st.write(f"✅ {MONTH_NAMES[month]} {EMBEDDED_CONFIG['year']}")
+        
+        st.markdown("**Coming Soon:**")
+        pending = get_pending_months()
+        for month in pending[:6]:  # Show next 6 pending months
+            st.write(f"⏳ {MONTH_NAMES[month]} {EMBEDDED_CONFIG['year']}")
+        
+        if len(pending) > 6:
+            st.write(f"... and {len(pending) - 6} more months")
+    
     with st.expander("💾 Download Features"):
         st.markdown("""
         **CSV Download:**
@@ -858,40 +1011,44 @@ with col2:
         - All administrative attributes included
         - Compatible with R, Python, SPSS, etc.
         - Includes projection information for custom uploads
+        - Special `analysis_type` field for embedded analyses
         
         **Excel Download:**
         - Multiple sheets: Data, Statistics, Metadata
         - Professional format for reports
         - Includes analysis parameters and timestamps
         - Enhanced metadata for custom shapefiles
+        - Data availability tracking
         """)
     
     with st.expander("🔧 Troubleshooting"):
         st.markdown("""
+        - **No months available**: Wait for new data releases
         - **Slow loading**: Try fewer months or lower admin level
-        - **No data**: Check if recent months (data has ~2 month delay)
         - **Error messages**: Often due to network connectivity
         - **Missing admin levels**: Not all countries have all 5 levels
         - **Large downloads**: Be patient with countries like Nigeria, DRC
-        - **Download issues**: Try smaller date ranges if files are too large
+        - **Download issues**: Try smaller month selections if files are too large
         - **Projection errors**: Include .prj file with custom shapefiles
         - **Coordinate system warnings**: Upload .prj file to eliminate assumptions
         """)
 
-    # Show current system info - SAFE VERSION
+    # Show current system info
     with st.expander("📊 System Information"):
         st.write(f"Current time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        # Only show country count when using GADM mode to avoid NameError
+        st.write(f"Embedded year: {EMBEDDED_CONFIG['year']}")
+        st.write(f"Available months: {len(get_available_months())}/12")
         if st.session_state.data_source == "GADM Database":
             st.write(f"Available countries: {len(COUNTRY_OPTIONS)}")
         else:
             st.write("Mode: Custom Shapefile Upload")
             st.write("Projection support: .prj files supported")
         st.write("Supported formats: CSV, Excel (.xlsx)")
-        st.write("Max recommended: 12 months, Admin level ≤3 for large countries")
-        st.write("Tool version: v2.1 (with .prj support)")
+        st.write("Max recommended: Available months, Admin level ≤3 for large countries")
+        st.write("Tool version: v2.2 (Embedded Months with Backend Management)")
 
 # Footer
 st.markdown("---")
 st.markdown("*Built for malaria researchers and public health professionals*")
-st.markdown("**Contact**: Mohamed Sillah Kanu | Informarics Consultancy Firm- Sierra Leone (ICF-SL)")
+st.markdown("**Contact**: Mohamed Sillah Kanu | Informatics Consultancy Firm- Sierra Leone (ICF-SL)")
+st.markdown(f"**Note**: This version is configured for {EMBEDDED_CONFIG['year']} analysis with {len(get_available_months())} months currently available.")
