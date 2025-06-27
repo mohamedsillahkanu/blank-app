@@ -68,7 +68,7 @@ COUNTRY_OPTIONS = {
 
 # BACKEND CONFIGURATION FOR 2025 EMBEDDED MONTHS
 # ==============================================
-EMBEDDED_2025_MONTHS = [1, 2, 3, 4]  # Jan, Feb, Mar, Apr, May for 2025
+EMBEDDED_2025_MONTHS = [1, 2, 3, 4, 5]  # Jan, Feb, Mar, Apr, May for 2025
 
 def is_embedded_2025(year):
     """Check if this is 2025 and should use embedded months"""
@@ -441,8 +441,13 @@ with col1:
             st.error("Please upload all required shapefile components (.shp, .shx, .dbf)")
         else:
             # Progress tracking
-            progress_bar = st.progress(0)
-            status_text = st.empty()
+            progress_placeholder = st.empty()
+            status_placeholder = st.empty()
+            
+            with progress_placeholder.container():
+                progress_bar = st.progress(0)
+            with status_placeholder.container():
+                status_text = st.empty()
             
             try:
                 # Step 1: Load shapefile (GADM or uploaded)
@@ -490,6 +495,8 @@ with col1:
                 # Special message for 2025 embedded analysis
                 if is_embedded_2025(year):
                     st.success(f"🗓️ **2025 Comprehensive Analysis**: Processing {len(selected_months)} months automatically")
+                else:
+                    st.success(f"🗓️ **{year} Full Year Analysis**: Processing all {len(selected_months)} months")
                 
                 # Test CHIRPS data availability before processing all months (only for first month)
                 status_text.text("🔍 Testing CHIRPS data availability...")
@@ -538,6 +545,20 @@ with col1:
                 # Step 3: Generate visualizations
                 status_text.text("📊 Generating maps...")
                 progress_bar.progress(90)
+                
+                # Clear progress indicators before showing results
+                progress_bar.progress(100)
+                status_text.text("✅ Analysis complete!")
+                
+                # Add a small delay to ensure the completion message is visible
+                time.sleep(1)
+                
+                # Clear the progress indicators to make room for results
+                progress_placeholder.empty()
+                status_placeholder.empty()
+                
+                # Now display the results permanently
+                st.success(f"🎉 Analysis completed successfully for {st.session_state.country} ({year})!")
                 
                 # Create subplots
                 num_months = len(processed_data)
@@ -851,8 +872,9 @@ with col2:
     
     **2025 Special Feature:**
     - For 2025, Jan-May months are automatically analyzed
-    - No manual month selection needed for 2025
-    - Comprehensive coverage of early year rainfall patterns
+    - For all other years, all 12 months are automatically processed
+    - No manual month selection interface
+    - Streamlined workflow for comprehensive analysis
     
     **Use Cases:**
     - Seasonal Malaria Chemoprevention planning
@@ -949,15 +971,15 @@ with col2:
     with st.expander("📊 System Information"):
         current_year = datetime.now().year
         st.write(f"Current time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        st.write(f"Available years: 1981-{current_year}")
+        st.write("Available years: 1981-{current_year}")
         st.write(f"Countries available: {len(COUNTRY_OPTIONS)}")
-        st.write("2025 embedded months: Jan, Feb, Mar, Apr, May")
+        st.write("2025: Jan-May (embedded) | Other years: All 12 months")
+        st.write("Month selection: Fully automated")
         st.write("Supported formats: CSV, Excel (.xlsx)")
-        st.write("Max recommended: 12 months, Admin level ≤3 for large countries")
-        st.write("Tool version: v2.1 (with 2025 embedded months)")
+        st.write("Max recommended: Admin level ≤3 for large countries")
+        st.write("Tool version: v2.1 (Automated month selection)")
 
 # Footer
 st.markdown("---")
 st.markdown("*Built for malaria researchers and public health professionals*")
 st.markdown("**Contact**: Mohamed Sillah Kanu | Informarics Consultancy Firm- Sierra Leone (ICF-SL)")
-st.markdown("**Note**: For 2025 analysis, Jan-May months are automatically selected for comprehensive rainfall assessment.")
